@@ -1,7 +1,7 @@
 package com.ameschot.retryutil;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -18,8 +18,8 @@ public class RetryTest {
         String result = Retry.retry(() -> functionSuccess("This many paws: ", i), Objects::nonNull, (i1, e) -> System.out.println("warning " + i1+"/"+ e), Retry.DelayStrategies.NORMAL, retryConfig);
         long end = System.currentTimeMillis();
 
-        Assert.assertEquals("This many paws: 1", result);
-        Assert.assertTrue(end - start < 300);
+        Assertions.assertEquals("This many paws: 1", result);
+        Assertions.assertTrue(end - start < 300);
     }
 
     @Test
@@ -27,10 +27,10 @@ public class RetryTest {
         Retry.RetryConfig retryConfig = new Retry.RetryConfig(3, 5);
         AtomicInteger i = new AtomicInteger(0);
 
-        Exception ex = Assert.assertThrows(ArithmeticException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof IndexOutOfBoundsException, null, Retry.DelayStrategies.NORMAL, retryConfig));
+        Exception ex = Assertions.assertThrows(ArithmeticException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof IndexOutOfBoundsException, null, Retry.DelayStrategies.NORMAL, retryConfig));
 
-        Assert.assertEquals(1,i.get());
-        Assert.assertTrue(ex instanceof ArithmeticException);
+        Assertions.assertEquals(1,i.get());
+        Assertions.assertTrue(ex instanceof ArithmeticException);
     }
 
     @Test
@@ -38,10 +38,10 @@ public class RetryTest {
         Retry.RetryConfig retryConfig = new Retry.RetryConfig(3, 5);
         AtomicInteger i = new AtomicInteger(0);
 
-        Exception ex = Assert.assertThrows(ArithmeticException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof ArithmeticException, (i1, e) -> System.out.println("warning " + i1+"/"+ e), Retry.DelayStrategies.NORMAL, retryConfig));
+        Exception ex = Assertions.assertThrows(ArithmeticException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof ArithmeticException, (i1, e) -> System.out.println("warning " + i1+"/"+ e), Retry.DelayStrategies.NORMAL, retryConfig));
 
-        Assert.assertEquals(4,i.get());
-        Assert.assertTrue(ex instanceof ArithmeticException);
+        Assertions.assertEquals(4,i.get());
+        Assertions.assertTrue(ex instanceof ArithmeticException);
     }
 
     @Test
@@ -53,23 +53,23 @@ public class RetryTest {
         String result = Retry.retry(() -> functionSuccessError("This many paws: ", i, 2, new ArithmeticException()), e -> e instanceof ArithmeticException, (i1, e) -> System.out.println("warning " + i1+"/"+ e), Retry.DelayStrategies.NORMAL, retryConfig);
         long end = System.currentTimeMillis();
 
-        Assert.assertEquals("This many paws: 2", result);
+        Assertions.assertEquals("This many paws: 2", result);
     }
 
     @Test
     public void testNormalDelay(){
-        Assert.assertEquals(300, Retry.DelayStrategies.NORMAL.calculateDelay(1,300));
-        Assert.assertEquals(600, Retry.DelayStrategies.NORMAL.calculateDelay(2,300));
-        Assert.assertEquals(900, Retry.DelayStrategies.NORMAL.calculateDelay(3,300));
-        Assert.assertEquals(1200, Retry.DelayStrategies.NORMAL.calculateDelay(4,300));
+        Assertions.assertEquals(300, Retry.DelayStrategies.NORMAL.calculateDelay(1,300));
+        Assertions.assertEquals(600, Retry.DelayStrategies.NORMAL.calculateDelay(2,300));
+        Assertions.assertEquals(900, Retry.DelayStrategies.NORMAL.calculateDelay(3,300));
+        Assertions.assertEquals(1200, Retry.DelayStrategies.NORMAL.calculateDelay(4,300));
     }
 
     @Test
     public void testExponentialDelay(){
-        Assert.assertEquals(5, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(1,5));
-        Assert.assertEquals(25, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(2,5));
-        Assert.assertEquals(125, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(3,5));
-        Assert.assertEquals(625, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(4,5));
+        Assertions.assertEquals(5, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(1,5));
+        Assertions.assertEquals(25, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(2,5));
+        Assertions.assertEquals(125, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(3,5));
+        Assertions.assertEquals(625, Retry.DelayStrategies.EXPONENTIAL.calculateDelay(4,5));
     }
 
     public String functionSuccess(String s, AtomicInteger i) {
