@@ -2,15 +2,23 @@ package com.ameschot.retryutil;
 
 public class Retry {
 
-
+    /**
+     * @see Retry#retry(IRetryableAction, IRetryAssertion, DelayStrategies, RetryConfig)
+     */
     public static <T> T retry (IRetryableAction<T> retryableAction, RetryConfig retryConfig){
         return retry(retryableAction,e -> true,DelayStrategies.NORMAL,retryConfig);
     }
 
+    /**
+     * @see Retry#retry(IRetryableAction, IRetryAssertion, DelayStrategies, RetryConfig)
+     */
     public static <T> T retry (IRetryableAction<T> retryableAction, DelayStrategies delayStrategy, RetryConfig retryConfig){
         return retry(retryableAction,e -> true,delayStrategy,retryConfig);
     }
 
+    /**
+     * @see Retry#retry(IRetryableAction, IRetryAssertion, DelayStrategies, RetryConfig)
+     */
     public static <T> T retry (IRetryableAction<T> retryableAction, IRetryAssertion retryAssertion,DelayStrategies delayStrategy, RetryConfig retryConfig){
         return retry(retryableAction,retryAssertion,delayStrategy,retryConfig);
     }
