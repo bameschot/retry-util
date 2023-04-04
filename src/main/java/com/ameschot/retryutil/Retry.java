@@ -15,7 +15,19 @@ public class Retry {
         return retry(retryableAction,retryAssertion,delayStrategy,retryConfig);
     }
 
-    public static <T> T retry(IRetryableAction<T> retryableAction, IRetryAssertion retryAssertion, IDoOnRetry iDoOnRetry, DelayStrategies delayStrategy, RetryConfig retryConfig) throws Exception {
+    /**
+     * Retry the provided action for a specified amount of times using a delay determined by the provided {@link DelayStrategies} and {@link RetryConfig} when the exception matches the provided assertion.
+     * @param retryableAction The action to retry
+     * @param retryAssertion The assertion that determines if an exception is retried
+     * @param doOnRetry The action to perform if the action is retried, executed before the delay. If left null no action is performed
+     * @param delayStrategy The delay strategy used to calculate the delay ach retry
+     * @param retryConfig The configuration used to determine the amount of retries and the delay
+     * @return The result of the action
+     * @param <T> The type of the result of the action
+     * @throws RetryException every exception thrown by the action to retry are wrapped in a {@link RetryException}
+     */
+
+    public static <T> T retry(IRetryableAction<T> retryableAction, IRetryAssertion retryAssertion, IDoOnRetry doOnRetry, DelayStrategies delayStrategy, RetryConfig retryConfig) {
         int retriesLeft = retryConfig.getMaxRetries();
         int currentDelay;
 
@@ -31,8 +43,8 @@ public class Retry {
                         currentDelay = delayStrategy.calculateDelay(retry, retryConfig.getDelayMs());
 
                         //perform retry action if provided
-                        if (iDoOnRetry != null) {
-                            iDoOnRetry.perform(retryConfig.maxRetries - retriesLeft, e);
+                        if (doOnRetry != null) {
+                            doOnRetry.perform(retryConfig.maxRetries - retriesLeft, e);
                         }
 
                         //busy wait for the indicated delay
@@ -41,7 +53,7 @@ public class Retry {
                         //discard
                     }
                 } else {
-                    throw e;
+                    throw new RetryException(e);
                 }
             }
         }
@@ -52,7 +64,7 @@ public class Retry {
     }
 
     public interface IDoOnRetry {
-        void perform(int retryCount, Exception e) throws Exception;
+        void perform(int retryCount, Exception e);
     }
 
     public interface IRetryAssertion {
@@ -74,6 +86,12 @@ public class Retry {
 
         public int getDelayMs() {
             return delayMs;
+        }
+    }
+
+    public static class RetryException extends RuntimeException{
+        public RetryException(Throwable cause) {
+            super(cause);
         }
     }
 

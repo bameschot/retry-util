@@ -27,10 +27,10 @@ public class RetryTest {
         Retry.RetryConfig retryConfig = new Retry.RetryConfig(3, 5);
         AtomicInteger i = new AtomicInteger(0);
 
-        Exception ex = Assertions.assertThrows(ArithmeticException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof IndexOutOfBoundsException, null, Retry.DelayStrategies.NORMAL, retryConfig));
+        Exception ex = Assertions.assertThrows(Retry.RetryException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof IndexOutOfBoundsException, null, Retry.DelayStrategies.NORMAL, retryConfig));
 
         Assertions.assertEquals(1,i.get());
-        Assertions.assertTrue(ex instanceof ArithmeticException);
+        Assertions.assertTrue(ex.getCause() instanceof ArithmeticException);
     }
 
     @Test
@@ -38,10 +38,10 @@ public class RetryTest {
         Retry.RetryConfig retryConfig = new Retry.RetryConfig(3, 5);
         AtomicInteger i = new AtomicInteger(0);
 
-        Exception ex = Assertions.assertThrows(ArithmeticException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof ArithmeticException, (i1, e) -> System.out.println("warning " + i1+"/"+ e), Retry.DelayStrategies.NORMAL, retryConfig));
+        Exception ex = Assertions.assertThrows(Retry.RetryException.class, () -> Retry.retry(() -> functionError(new ArithmeticException(),i), e -> e instanceof ArithmeticException, (i1, e) -> System.out.println("warning " + i1+"/"+ e), Retry.DelayStrategies.NORMAL, retryConfig));
 
         Assertions.assertEquals(4,i.get());
-        Assertions.assertTrue(ex instanceof ArithmeticException);
+        Assertions.assertTrue(ex.getCause() instanceof ArithmeticException);
     }
 
     @Test
