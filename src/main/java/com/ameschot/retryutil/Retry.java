@@ -2,6 +2,19 @@ package com.ameschot.retryutil;
 
 public class Retry {
 
+
+    public static <T> T retry (IRetryableAction<T> retryableAction, RetryConfig retryConfig){
+        return retry(retryableAction,e -> true,DelayStrategies.NORMAL,retryConfig);
+    }
+
+    public static <T> T retry (IRetryableAction<T> retryableAction, DelayStrategies delayStrategy, RetryConfig retryConfig){
+        return retry(retryableAction,e -> true,delayStrategy,retryConfig);
+    }
+
+    public static <T> T retry (IRetryableAction<T> retryableAction, IRetryAssertion retryAssertion,DelayStrategies delayStrategy, RetryConfig retryConfig){
+        return retry(retryableAction,retryAssertion,delayStrategy,retryConfig);
+    }
+
     public static <T> T retry(IRetryableAction<T> retryableAction, IRetryAssertion retryAssertion, IDoOnRetry iDoOnRetry, DelayStrategies delayStrategy, RetryConfig retryConfig) throws Exception {
         int retriesLeft = retryConfig.getMaxRetries();
         int currentDelay;
